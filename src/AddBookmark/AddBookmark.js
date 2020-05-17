@@ -1,15 +1,18 @@
 import React, { Component } from  'react';
 import config from '../config'
 import './AddBookmark.css';
+import BookmarkContext from '../BookmarkContext';
 
 const Required = () => (
   <span className='AddBookmark__required'>*</span>
 )
 
-class AddBookmark extends Component {
+class AddBookmark extends Component { 
   static defaultProps = {
-    onAddBookmark: () => {}
+    forceRender: () => {}
   };
+
+  static contextType = BookmarkContext;
 
   state = {
     error: null,
@@ -19,13 +22,17 @@ class AddBookmark extends Component {
     e.preventDefault()
     // get the form fields from the event
     const { title, url, description, rating } = e.target
+    //creating the new bookmark object below
     const bookmark = {
       title: title.value,
       url: url.value,
       description: description.value,
       rating: rating.value,
     }
-    this.setState({ error: null })
+
+    this.setState({ error: null });
+
+    //now we are posting the new bookmark to the server
     fetch(config.API_ENDPOINT, {
       method: 'POST',
       body: JSON.stringify(bookmark),
@@ -42,14 +49,18 @@ class AddBookmark extends Component {
             throw error
           })
         }
+        console.log(res);
         return res.json()
-      })
+      }) //once the POST is successful, reset the form values back to " ".
       .then(data => {
         title.value = ''
         url.value = ''
         description.value = ''
         rating.value = ''
-        this.props.onAddBookmark(data)
+
+        this.context.forceRender();
+        this.props.history.push("/");
+        
       })
       .catch(error => {
         this.setState({ error })
@@ -58,7 +69,7 @@ class AddBookmark extends Component {
 
   render() {
     const { error } = this.state
-    const { onClickCancel } = this.props
+    console.log(this.props);
     return (
       <section className='AddBookmark'>
         <h2>Create a bookmark</h2>
@@ -123,7 +134,7 @@ class AddBookmark extends Component {
             />
           </div>
           <div className='AddBookmark__buttons'>
-            <button type='button' onClick={onClickCancel}>
+            <button type='button' onClick={()=> {this.props.history.goBack()}}>
               Cancel
             </button>
             {' '}

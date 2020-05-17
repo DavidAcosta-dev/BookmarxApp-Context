@@ -1,5 +1,6 @@
 import React from 'react';
 import './Rating.css';
+import PropTypes from 'prop-types';
 
 export default function Rating(props) {
   const stars = [0, 0, 0, 0, 0].map((_, i) =>
@@ -12,4 +13,15 @@ export default function Rating(props) {
       {stars}
     </div>
   );
+}
+
+Rating.propTypes = {
+  value: PropTypes
+         .oneOf([1,2,3,4,5])
+         .isRequired
+}
+
+
+Rating.defaultProps = {
+  value: 1
 }
